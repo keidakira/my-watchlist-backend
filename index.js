@@ -101,6 +101,34 @@ app.get("/movie/:id", (req, res) => {
   })();
 });
 
+app.get("/search", (req, res) => {
+  (async () => {
+    const { query } = req.query;
+
+    let response = await API.get(`/search/movie?query=${query}&type=tv`);
+
+    let movieData = response.data.results.map((d) => {
+      return {
+        ...d,
+        media_type: "movie",
+      };
+    });
+
+    response = await API.get(`/search/tv?query=${query}&type=tv`);
+
+    let tvData = response.data.results.map((d) => {
+      return {
+        ...d,
+        media_type: "tv",
+      };
+    });
+
+    res.json({
+      results: [...movieData, ...tvData],
+    });
+  })();
+});
+
 app.listen(PORT, () => {
   console.log(`Listening on http://localhost:${PORT}`);
 });
